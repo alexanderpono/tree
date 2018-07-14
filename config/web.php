@@ -1,7 +1,13 @@
 <?php
 
-$params = require __DIR__ . '/params.php';
-$db = require __DIR__ . '/db.php';
+$params = require(__DIR__ . '/params.php');
+$localParamsFile = __DIR__ . '/params-local.php';
+if (file_exists($localParamsFile)) {
+    $localParams = require($localParamsFile);
+    $params = array_merge($params, $localParams);
+}
+
+
 
 $config = [
     'id' => 'basic',
@@ -42,7 +48,7 @@ $config = [
                 ],
             ],
         ],
-        'db' => $db,
+        'db' => $params['db'],
         /*
         'urlManager' => [
             'enablePrettyUrl' => true,
