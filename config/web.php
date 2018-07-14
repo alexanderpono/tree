@@ -16,6 +16,7 @@ $config = [
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
+        '@api'   => '@app/modules/api',
     ],
     'components' => [
         'request' => [
@@ -41,22 +42,56 @@ $config = [
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
+            'flushInterval' => 1,   // default is 1000
             'targets' => [
                 [
                     'class' => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning'],
+                    'logFile' => '@app/runtime/logs/error.log',
+                    'maxFileSize'  => 10240,
+                    'maxLogFiles'  => 10,
+                    'rotateByCopy' => true,
+                ],
+                [
+                    'class' => 'yii\log\FileTarget',
+                    'levels' => ['info', 'trace'],
+                    'logFile' => '@app/runtime/logs/debug.log',
+                    'maxFileSize'  => 10240,
+                    'maxLogFiles'  => 10,
+                    'rotateByCopy' => true,
+                    'logVars' => [],
+                    'prefix' => function ($message) {return "";},
+                ],
+                [
+                    'class' => 'api\v1\components\MyFileTarget',
+                    'levels' => ['error', 'warning', 'info', 'profile', 'trace'],
+                    'logFile' => '@app/runtime/logs/api.log',
+                    'maxFileSize'  => 10240,
+                    'maxLogFiles'  => 10,
+                    'rotateByCopy' => true,
+                    'categories' => ['api'],
+                    'logVars' => [],
+                    'prefix' => function ($message) {return "";},
                 ],
             ],
         ],
+
+
         'db' => $params['db'],
-        /*
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
+            'enableStrictParsing' => true,
             'rules' => [
+                '/' => 'site/index',
+                'api/<version:v\d+>/<action:\w+\/?>' => 'api/<version>/<action>',
             ],
         ],
-        */
+    ],
+    'modules' => [
+        'api' => [
+            'class' => 'api\ApiModule',
+        ],
     ],
     'params' => $params,
 ];
